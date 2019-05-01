@@ -56,7 +56,7 @@ def clean_data(df):
 def save_data(df,database_name):
     # LOADING TO DATABASE
 
-    database_filepath = 'sqlite:///{}.db'.format(database_name)
+    database_filepath = 'sqlite:///{}'.format(database_name)
     engine = sqlalchemy.create_engine(database_filepath)
     df.to_sql('messages', engine, index=False, if_exists='replace')
 
