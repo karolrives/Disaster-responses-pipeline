@@ -43,7 +43,7 @@ def tokenize(text):
     clean_tokens = []
     for tok in tokens:
         # lemmatize, normalize case, and remove leading/trailing white space
-        clean_tok = lemmatizer.lemmatize(re.sub(r"[^a-zA-Z0-9]", " ", tok.lower())).strip()
+        clean_tok = lemmatizer.lemmatize(re.sub(r"[^a-zA-Z0-9]", " ", tok.lower()), pos='v').strip()
         clean_tokens.append(clean_tok)
 
     return clean_tokens
