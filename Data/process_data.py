@@ -4,13 +4,19 @@ import sqlalchemy
 
 
 def load_data(messages_filepath, categories_filepath):
+    '''
+    Loads the messages and categories data and merge them into a single dataset.
 
+    :param messages_filepath: Messages csv file
+    :param categories_filepath: Categories cvs fle
+    :return df: Resulting dataset
+    '''
     #Reading files
 
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
 
-    #Mergind dataframes
+    #Merging dataframes
 
     df = messages.merge(categories, how='left', on='id')
 
@@ -18,7 +24,12 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    '''
+    Cleans, wrangles and removes duplicates from df.
 
+    :param df: Merged data set (messages and categories)
+    :return df: Cleaned data set
+    '''
     # Splitting categories into separate columns
     categories = df['categories'].str.split(';', expand=True)
 
@@ -54,6 +65,13 @@ def clean_data(df):
 
 
 def save_data(df,database_name):
+    '''
+    Saves df in a SQLite database named database_name.
+
+    :param df: cleaned data set
+    :param database_name: location and name of the database where df is to be stored.
+    :return None
+    '''
     # LOADING TO DATABASE
 
     database_filepath = 'sqlite:///{}'.format(database_name)
