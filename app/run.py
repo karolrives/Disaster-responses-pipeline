@@ -33,7 +33,7 @@ engine = create_engine('sqlite:///../Data/DisasterResponse.db')
 df = pd.read_sql_table('messages', engine)
 
 # load model
-model = joblib.load("../models/final_model_v2.sav")
+model = joblib.load("../models/final_model_v3.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
@@ -45,10 +45,65 @@ def index():
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
-    
+
+    df_group = df.drop(columns=['id','message','original']).groupby('genre').sum()
+    df_group = df_group.T
+    df_group['total'] = df_group.direct + df_group.news + df_group.social
+    df_group.sort_values(by='total', ascending=False, inplace=True)
+    df_group.drop(columns=['total'], inplace=True)
+
+
+
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
+        {
+            'data': [
+                Bar(
+                    x = df_group.index.tolist(),
+                    y = df_group['news'],
+                    name = 'news',
+                    width = 0.8,
+                    #orientation = 'h'
+
+                ),
+                Bar(
+                    x = df_group.index.tolist(),
+                    y = df_group['direct'],
+                    name = 'direct',
+                    #orientation='h',
+                    width=0.8,
+                ),
+                Bar(
+                    x = df_group.index.tolist(),
+                    y = df_group['social'],
+                    name='social',
+                    #orientation='h',
+                    width=0.8,
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of messages by category',
+                'yaxis': {
+                    'title': 'Count'
+                },
+                'xaxis': {
+                    'title': ' '
+                },
+                'barmode': 'stack',
+                'legend': {
+                    'orientation': 'h',
+                    'x': 0.33,
+                    'y': 1.1
+                },
+                'margin': {
+                    #'l': 1
+                },
+                'width': 740
+            }
+
+        },
         {
             'data': [
                 Bar(
