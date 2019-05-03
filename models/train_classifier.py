@@ -21,6 +21,14 @@ from sklearn.metrics import classification_report
 import pickle
 
 def load_data(database_filepath):
+    '''
+    Loads a table 'messages' from the database_filepath.
+
+    :param database_filepath: Location and name of the database where the data is stored.
+    :return X: list of messages
+    :return y: list of categories for each message
+    :return labels: category names list
+    '''
     database_filepath = 'sqlite:///{}'.format(database_filepath)
     engine = sqlalchemy.create_engine(database_filepath)
 
@@ -32,6 +40,12 @@ def load_data(database_filepath):
     return X, y, labels
 
 def tokenize(text):
+    '''
+    Normalizes and Lemmatizes text.
+
+    :param text: a text message
+    :return clean_tokens: normalized and lemmatized tokens in a list
+    '''
     # tokenize text
     tokens = word_tokenize(text)
     tokens = [w for w in tokens if w not in stopwords.words("english")]
@@ -50,6 +64,10 @@ def tokenize(text):
 
 
 def build_model():
+    '''
+    Builds the machine learning pipeline using gridsearch.
+    :return cv: model
+    '''
     # model pipeline
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
@@ -70,7 +88,15 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+    Makes predictions for X_test and evaluate them.
 
+    :param model: pipeline model
+    :param X_test: testing data messages
+    :param Y_test: testing data categories
+    :param category_names: category names
+    :returns None
+    '''
     y_pred = model.predict(X_test)
 
     print("\nBest Parameters: \n", model.best_params_)
@@ -80,6 +106,13 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''
+    Stores model in a pickle file.
+
+    :param model: model to be stored
+    :param model_filepath: location where model is to be stored
+    :returns None
+    '''
 
     pickle.dump(model, open(model_filepath, 'wb'))
 
