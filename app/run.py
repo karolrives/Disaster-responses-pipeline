@@ -153,6 +153,9 @@ def index():
                 Bar(
                     x = category_comb.categories[:15],
                     y = category_comb.total[:15],
+                    marker=dict(
+                        color = 'rgb(214, 39, 40)'
+                    )
                     #orientation = 'h'
                 )
             ],
