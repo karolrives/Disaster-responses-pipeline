@@ -45,13 +45,36 @@ def index():
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
-
+    #First plot
     df_group = df.drop(columns=['id','message','original']).groupby('genre').sum()
     df_group = df_group.T
     df_group['total'] = df_group.direct + df_group.news + df_group.social
     df_group.sort_values(by='total', ascending=False, inplace=True)
     df_group.drop(columns=['total'], inplace=True)
+    #Third plot
+    df_cat = df.loc[:,'related':]
+    #obtaining the total number of all category combinations
+    result = df_cat.groupby(df_cat.columns.tolist()).size().reset_index()
+    result.columns = ['related', 'request', 'offer', 'aid_related', 'medical_help',
+                      'medical_products', 'search_and_rescue', 'security', 'military',
+                      'child_alone', 'water', 'food', 'shelter', 'clothing', 'money',
+                      'missing_people', 'refugees', 'death', 'other_aid',
+                      'infrastructure_related', 'transport', 'buildings', 'electricity',
+                      'tools', 'hospitals', 'shops', 'aid_centers',
+                      'other_infrastructure', 'weather_related', 'floods', 'storm',
+                      'fire', 'earthquake', 'cold', 'other_weather', 'direct_report', 'total']
+    #storing total in a new variable
+    total_comb = result.loc[:, 'total':]
+    result.drop(columns='total', inplace=True)
+    column_names = list()
+    #Obtaining the column names with '1' values for each category combination
+    for index, row in result.iterrows():
+        cols_list = result.columns[(result == 1).iloc[index]]
+        column_names.append(", ".join(cols_list))
 
+    category_comb = pd.concat([pd.Series(column_names), total_comb], axis=1)
+    category_comb.columns = ['categories', 'total']
+    category_comb.sort_values(by='total',ascending=False, inplace=True)
 
 
     # create visuals
@@ -100,7 +123,7 @@ def index():
                 'margin': {
                     #'l': 1
                 },
-                'width': 740
+                #'width': 740
             }
 
         },
@@ -108,7 +131,10 @@ def index():
             'data': [
                 Bar(
                     x=genre_names,
-                    y=genre_counts
+                    y=genre_counts,
+                    marker= dict(
+                        color = ['rgb(255, 127, 14)', 'rgb(31, 119, 180)', 'rgb(44, 160, 44)']
+                    )
                 )
             ],
 
@@ -120,6 +146,29 @@ def index():
                 'xaxis': {
                     'title': "Genre"
                 }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x = category_comb.categories[:15],
+                    y = category_comb.total[:15],
+                    #orientation = 'h'
+                )
+            ],
+
+            'layout': {
+                'title': 'Top Category-Combination total',
+                'yaxis': {
+                    'title': 'Count'
+                },
+                'xaxis': {
+                    #'title': 'Categories'
+                    'tickfont': {
+                        'size': 9
+                    }
+                }
+
             }
         }
     ]
